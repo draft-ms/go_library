@@ -1,0 +1,5 @@
+{
+    "LOG_LEVEL":"ERROR", 
+    "LOG_FILENAME":"test.log",
+    "LOG_DIR":"/"
+}
