@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/draft-ms/library/configuration"
+	"github.com/draftms/library/configuration"
 	"github.com/sirupsen/logrus"
 )
 
@@ -24,10 +24,18 @@ func init() {
 }
 
 func main() {
+	//////How to use logrus
 	//print log as loglevel
 	fmt.Printf("loglevel : %s \n", Configuration.LOG_LEVEL)
 	logrus.Info("Info level log")
 	logrus.Warn("Warn level log")
 	logrus.Debug("Debug level log")
 	logrus.Error("Error level log")
+
+	logrus.WithFields(logrus.Fields{
+		"addField1": "field1_val",
+		"addField2": "field2_val",
+	}).Error("Added fields error level log")
+	//////How to use logrus
+
 }
