@@ -1,13 +1,14 @@
 package logging
 
 import (
-	"os"
-	"github.com/sirupsen/logrus"
+	"time"
+	//"fmt"
 	"github.com/draftms/go_library/configuration"
+	"github.com/lestrrat-go/file-rotatelogs"
+	"github.com/sirupsen/logrus"
 )
 
 var gLoger *logrus.Logger
-var gLogEntry *logrus.Entry
 var Configuration config.Configuration = config.GetConfig()
 
 func NewInstance() *logrus.Logger {
@@ -17,7 +18,6 @@ func NewInstance() *logrus.Logger {
 	}
 
 	gLoger = logrus.New()
-	gLogEntry = logrus.NewEntry(gLoger)
 
 	//Set log level
 	switch Configuration.LOG_LEVEL {
@@ -39,15 +39,29 @@ func NewInstance() *logrus.Logger {
 	}) 	
 	
 	//for logfile
-	filelog, err := os.OpenFile("test.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
+	/*
+ 	filelog, err := os.OpenFile("test.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
 	if err != nil {
 		panic(err)
 	} 
+	//to-do 차후 defer 처리 필요
 	//defer filelog.Close()	
-	
-	gLoger.SetOutput(filelog)
+ 	*/
 
-	//logrus.Fields
-	//type Fields map[string]interface{}
+	writer, err := rotatelogs.New(
+		//fmt.Sprintf("%s.%s", path, "%Y-%m-%d.%H:%M:%S"),
+		"log.%Y%m%d.log",
+		//rotatelogs.WithLinkName("."),
+		rotatelogs.WithMaxAge(24*time.Hour),
+		rotatelogs.WithRotationTime(time.Hour),
+		rotatelogs.WithRotationSize(1000000),
+	)
+	if err != nil {
+		panic(err)
+	}
+	
+	gLoger.SetOutput(writer)
+	//gLoger.SetOutput(filelog)
+
 	return gLoger
 }
