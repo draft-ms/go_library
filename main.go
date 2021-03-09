@@ -1,35 +1,54 @@
-package main 
+package main
 
 import (
-	"fmt"
-	"github.com/draftms/go_library/configuration"
+	"time"
 	"github.com/draftms/go_library/logging"
+	"github.com/kardianos/service"
 )
 
-//Configuration .
-var Configuration config.Configuration = config.GetConfig()
+type program struct{}
+
 var logger = logging.NewInstance()
 
-func init() {
+func (p *program) Start(s service.Service) error {
+	// Start should not block. Do the actual work async.
+	go p.run()
+	return nil
+}
+func (p *program) run() {
+	// Do work here
+	for {
+		time.Sleep(1*time.Second)
+		logger.Info("Windows Service Action : Service Loop" + time.Now().String())
+	}
 
 }
+func (p *program) Stop(s service.Service) error {
+	// Stop should not block. Return with a few seconds.
+	return nil
+}
+
+var servicLoger service.Logger
 
 func main() {
 
-	//////How to use logrus
-	//print log as loglevel
-	fmt.Printf("loglevel : %s \n", Configuration.LOG_LEVEL)
-	logger.Info("Info level log")
-	logger.Warn("Warn level log")
-	logger.Debug("Debug level log")
-	logger.Error("Error level log")
+ 	svcConfig := &service.Config{
+		Name:        "GoSVCTest",
+		DisplayName: "Go SVC Test",
+		Description: "This is a test Go service.",
+	}
 
-	//to-do Fields 
-	/*
-	logger.WithFields(logger.Fields{
-		"addField1": "field1_val",
-		"addField2": "field2_val",
-	}).Error("Added fields error level log")
-	*/
-	//////How to use logrus
+	prg := &program{}
+	s, err := service.New(prg, svcConfig)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	servicLoger, err = s.Logger(nil)
+	if err != nil {
+		logger.Fatal(err)
+	}
+	err = s.Run()
+	if err != nil {
+		servicLoger.Error(err)
+	}
 }
