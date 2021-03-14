@@ -2,16 +2,17 @@ package logging
 
 import (
 	"time"
-	//"fmt"
 	"github.com/draftms/go_library/configuration"
 	"github.com/lestrrat-go/file-rotatelogs"
 	"github.com/sirupsen/logrus"
 )
 
 var gLoger *logrus.Logger
-var Configuration config.Configuration = config.GetConfig()
+var configuration config.Configuration
 
 func NewInstance() *logrus.Logger {
+
+	configuration = configuration.GetConfig()
 
 	if gLoger != nil {
 		return gLoger
@@ -20,7 +21,7 @@ func NewInstance() *logrus.Logger {
 	gLoger = logrus.New()
 
 	//Set log level
-	switch Configuration.LOG_LEVEL {
+	switch configuration.LOG_LEVEL {
 		case "DEBUG":
 			gLoger.SetLevel(logrus.DebugLevel)
 		case "ERROR":
@@ -37,20 +38,9 @@ func NewInstance() *logrus.Logger {
 	gLoger.SetFormatter(&logrus.TextFormatter{
 		FullTimestamp: true,
 	}) 	
-	
-	//for logfile
-	/*
- 	filelog, err := os.OpenFile("test.log", os.O_CREATE|os.O_WRONLY|os.O_APPEND, 0666)
-	if err != nil {
-		panic(err)
-	} 
-	//to-do 차후 defer 처리 필요
-	//defer filelog.Close()	
- 	*/
 
 	writer, err := rotatelogs.New(
-		//fmt.Sprintf("%s.%s", path, "%Y-%m-%d.%H:%M:%S"),
-		"log.%Y%m%d.log",
+		configuration.LOG_PATH + "log.%Y%m%d.log",
 		//rotatelogs.WithLinkName("."),
 		rotatelogs.WithMaxAge(24*time.Hour),
 		rotatelogs.WithRotationTime(time.Hour),

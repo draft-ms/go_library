@@ -1,5 +1,5 @@
 {
     "LOG_LEVEL":"DEBUG", 
     "LOG_FILENAME":"test.log",
-    "LOG_DIR":"/"
+    "LOG_PATH":"d:/log/"
 }
