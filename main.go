@@ -1,20 +1,10 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"os"
 	"time"
-	"reflect"
-
-	//"encoding/json"
 
 	"github.com/draftms/go_library/logging"
 	"github.com/kardianos/service"
-
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 type program struct{}
@@ -49,7 +39,6 @@ var servicLoger service.Logger
 
 func main() {
     //1. for windows service
-/* 
  	svcConfig := &service.Config{
 		Name:        "GoSVCTest",
 		DisplayName: "Go SVC Test",
@@ -69,7 +58,6 @@ func main() {
 	if err != nil {
 		servicLoger.Error(err)
 	}
- */
 
 /*  
     defer func() {
@@ -80,64 +68,4 @@ func main() {
         }
     }()
 */
-
-    clientOptions := options.Client().ApplyURI("mongodb://localhost:27017/admin?safe=true")
-
-    client, err := mongo.Connect(context.TODO(), clientOptions)
-
-    if err != nil { 
-        logger.Error(err)
-    }
-
-    err = client.Ping(context.TODO(), nil)
-
-    if err != nil {
-        logger.Error(err)
-    }
-
-    collection := client.Database("local").Collection("analyzer")
-
-    //var result user
-
-    //filter := bson.D{{"name", "Cloud"}}
-
-
-	//1.Insert mongoDB data
-	insertResult, err := collection.InsertOne(context.TODO(), bson.D{
-		{Key:"name",Value:"test2"},
-		{Key:"code",Value:"10-12"},
-		{Key:"cusvalue",Value:"hud"},
-	})
-
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-    fmt.Println("Add data : ", insertResult.InsertedID)
-
-	//2.Find mongoDB data
-	findResultCursor, err := collection.Find(context.TODO(), bson.M{})
-
-	if err != nil {
-		logger.Fatal(err)
-	}
-
-	if err = findResultCursor.All(context.TODO(), bson.D{}); err != nil {
-		fmt.Println(err)
-	}
-
-	//fmt.Println("Add data : ", findResult.ID())
-
-	for findResultCursor.Next(context.Background()) {
-		var result bson.M
-		err := findResultCursor.Decode(&result)
-
-		if err != nil {
-			fmt.Println("cursor.Next() error :",err)
-			os.Exit(1)
-		} else {
-			fmt.Println("result type :", reflect.TypeOf(result))
-			fmt.Println("result :", result)
-		}
-	}
 }
