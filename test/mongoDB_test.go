@@ -1,4 +1,4 @@
-package main_test
+package test
 
 import (
 	"context"
@@ -21,7 +21,7 @@ var clientOptions *options.ClientOptions
 var client *mongo.Client
 var ctx context.Context
 
-type analyzer struct {
+type Analyzer struct {
 	ID primitive.ObjectID 	`bson:"_id,omitempty"`
 	Name string 			`bson:"name,omitempty"`
 	Code string 			`bson:"code,omitempty"`
@@ -31,6 +31,7 @@ type analyzer struct {
 
 func mongoDBConnect(){
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
+
     clientOptions = options.Client().ApplyURI("mongodb://localhost:27017")
 
 	var err error
@@ -52,7 +53,7 @@ func TestMongoDBInsertOne(t *testing.T) {
     collection := client.Database("Dev").Collection("analyzer")
 
 	//1.Insert mongoDB data
- 	analyzer_doc := analyzer{
+ 	analyzer_doc := Analyzer{
 		Name:"test2", 
 		Code:"10-16", 
 		Cusvalue: "hud2",
@@ -74,14 +75,14 @@ func TestMongoDBInsertMany(t *testing.T) {
     collection := client.Database("Dev").Collection("analyzer")
 
 	//1.Insert mongoDB data
- 	analyzer_doc1 := analyzer{
+ 	analyzer_doc1 := Analyzer{
 		Name:"test2", 
 		Code:"10-16", 
 		Cusvalue: "hud2",
 		Tags: []string{"a","b","c"},
 	} 
 
-	analyzer_doc2 := analyzer{
+	analyzer_doc2 := Analyzer{
 		Name:"test2", 
 		Code:"10-16", 
 		Cusvalue: "hud2",
@@ -128,14 +129,14 @@ func TestMongoDBFindAll(t *testing.T) {
 			fmt.Println("result type :", reflect.TypeOf(result))
 			fmt.Println("result :", result)
 
-			var analyzerData analyzer
+			var analyzerData Analyzer
 			bsonBytes, _ := bson.Marshal(result)
 			bson.Unmarshal(bsonBytes, &analyzerData)
 
 			fmt.Println("struct data :", result)
 		}
 	}
-	
+
 	client.Disconnect(ctx)
 }
 
