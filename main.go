@@ -11,12 +11,6 @@ type program struct{}
 
 var logger = logging.NewInstance()
 
-type analyzer struct {
-	name string `bson:"logName"`
-	code string `bson:"logCode"`
-	cusvalue string `bson:"bson:logValue"`
-}
-
 func (p *program) Start(s service.Service) error {
 	// Start should not block. Do the actual work async.
 	go p.run()
@@ -38,6 +32,7 @@ func (p *program) Stop(s service.Service) error {
 var servicLoger service.Logger
 
 func main() {
+
     //1. for windows service
  	svcConfig := &service.Config{
 		Name:        "GoSVCTest",
