@@ -10,6 +10,7 @@ import (
 type User struct {
 	UserID string
 	UserName string
+	CreateAt time.Time
 }
 
 type Context interface {
