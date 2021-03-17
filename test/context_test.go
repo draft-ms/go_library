@@ -2,9 +2,9 @@ package test
 
 import (
 	"context"
+	"fmt"
 	"testing"
 	"time"
-	"fmt"
 )
 
 type User struct {
@@ -37,38 +37,78 @@ func TestContextWithValue (t *testing.T) {
 	}
 }
 
-func TestContextWithCancel(t *testing.T) {
-	ctx, cancel := context.WithCancel(context.Background())
+func TestChannel(t *testing.T) {
 
-	go func(){
-		cancel()
-	}()
+	testChan := make(chan string)
 
-	result, err := workProcessWithContext(ctx)
+	go Chantt(testChan)
 
-	if err != nil {
-		fmt.Println("error :", err)
-	}
-
-	fmt.Println("result :", result)
+	fmt.Println("chan value :", <-testChan)
 }
 
-func workProcessWithContext(ctx context.Context) (string,error) {
-	done := make(chan string)
+func Chantt(channel chan string) {
+	time.Sleep(10*time.Second)
+	channel <- "OK"
+}
+
+func TestPanic(t *testing.T) {
+	fmt.Println(divide(1,0))
+}
+
+func divide(a, b int) int {
+	defer func() {
+		if err := recover(); err != nil {
+			fmt.Println(err)
+		}
+	}()
+
+	return a / b
+}
+
+func TestRaceDetector(t *testing.T) {
+	c := make(chan bool)
+	m := make(map[string] string)
+
+	go func(){
+		m["12"] = "a"
+		c <- true
+	}()
+
+	m["13"] = "b"
+	<- c
+	for k, v:= range m {
+		fmt.Println(k,v)
+	}
+
+	//In terminal, you can text this "go run -race race.go"
+}
+
+func TestContextWithCancel3(t *testing.T) {
+	ctx, ctx_cancel := context.WithCancel(context.Background())
 
 	go func() {
-		done <- workProcess()
+		time.Sleep(10*time.Second)
+		ctx_cancel()
 	}()
 
 	select {
-	case result := <- done:
-		return result, nil
-	case <-ctx.Done():
-		return "Failed from context message", ctx.Err()
+	case <- ctx.Done():
+		fmt.Println("context canceled!")
 	}
 }
 
-func workProcess() string {
-	<-time.After(3*time.Second)
-	return "Done"
+func TestContextWithTimeout(t *testing.T) {
+	ctx, ctx_cancel := context.WithTimeout(context.Background(), 3*time.Second)
+
+	defer ctx_cancel()
+
+	go func() {
+		time.Sleep(10*time.Second)
+		fmt.Println("not working")
+	}()
+
+	select {
+	case <- ctx.Done():
+		fmt.Println("Timeout!! normal operating")
+	}
 }
