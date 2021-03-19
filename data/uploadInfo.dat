@@ -1,0 +1,27 @@
+
+{
+    "_id" : ObjectId("605219f1f3d0f122c0c97c6f"),
+    "rD" : "20210318000209",
+    "sD" : "20210317",
+    "h" : "SEOBU",
+    "rY" : "Y",
+    "bY" : "Y",
+    "stU" : "11122.99.952275249",
+    "seC" : "1",
+    "abf" : "C",
+    "mrY" : "Y",
+    "uploadInfo" : [ 
+        {
+            "s3key" : "20210317/6693778.zip",
+            "size" : NumberLong(5091260),
+            "bD" : "20210318",
+            "soC" : NumberLong(22)
+        }, 
+        {
+            "s3key" : "20210317/6693778.zip",
+            "size" : NumberLong(5091260),
+            "bD" : "20210318",
+            "soC" : NumberLong(1)
+        }
+    ]
+}
