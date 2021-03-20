@@ -29,6 +29,27 @@ type Analyzer struct {
 	Tags []string			`bson:"tags,omitempty"`
 }
 
+type ExpectedStudy struct {
+	ID primitive.ObjectID	`bson:"_id,omitempty"`
+	RegistDate string		`bson:"rD,omitempty"`
+	StudyDate string		`bson:"sD,omitempty"`
+	HospitalName string		`bson:"h,omitempty"`
+	RequestYN string		`bson:"rY,omitempty"`
+	BackupYN string			`bson:"bY,omitempty"`
+	StudyUID string			`bson:"stU,omitempty"`
+	SeriesUID string		`bson:"seC,omitempty"`
+	AddtionalBackupF string	`bson:"abf,omitempty"`
+	MRequestY string 		`bson:"mrY,omitempty"`
+	UploadInfo []UploadInfoData `bson:"uploadInfo,omitempty"`
+}
+
+type UploadInfoData struct {
+	S3Key string			`bson:"s3key,omitempty"`
+	size string				`bson:"size,omitempty"`
+	BackupDate string		`bson:"bD,omitempty"`
+	SOPCount string			`bson:"soC,omitempty"`
+}
+
 func mongoDBConnect(){
 	ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
 
@@ -171,4 +192,43 @@ func TestMongoDBFindOne(t *testing.T) {
 	}
 
 	client.Disconnect(ctx)
+}
+
+func TestExpectedStudy(t *testing.T) {
+		//Find mongoDB data
+		mongoDBConnect()
+		collection := client.Database("Dev").Collection("ExpectedStudy")
+	
+		findResultCursor, err := collection.Find(ctx, bson.M{})
+	
+		if err != nil {
+			logger.Fatal(err)
+		}
+	
+		if err = findResultCursor.All(ctx, bson.D{}); err != nil {
+			fmt.Println(err)
+		}
+	
+		//fmt.Println("Add data : ", findResult.ID())
+	
+		for findResultCursor.Next(ctx) {
+			var result bson.M
+			err := findResultCursor.Decode(&result)
+	
+			if err != nil {
+				fmt.Println("cursor.Next() error :",err)
+				os.Exit(1)
+			} else {
+				fmt.Println("result type :", reflect.TypeOf(result))
+				fmt.Println("result :", result)
+	
+				var expectedStudy ExpectedStudy
+				bsonBytes, _ := bson.Marshal(result)
+				bson.Unmarshal(bsonBytes, &expectedStudy)
+	
+				fmt.Println("struct data :", expectedStudy)
+			}
+		}
+	
+		client.Disconnect(ctx)
 }
