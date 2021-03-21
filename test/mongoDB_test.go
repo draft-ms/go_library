@@ -59,7 +59,8 @@ func TestExpectedStudy(t *testing.T) {
 	mongoDBConnect()
     collection := client.Database("Dev").Collection("ExpectedStudy")
 
-	findResultCursor, err := collection.Find(ctx, bson.D{})
+	//findResultCursor, err := collection.Find(ctx, bson.D{})
+	findResultCursor, err := collection.Find(ctx, bson.M{"h":"MEDICHECKSEOBU", "sD":bson.M{"$gte":"20210301","$lte":"20210331"}, "uploadInfo":bson.M{"$size":2}})
 
 	if err != nil {
 		logger.Fatal(err)
@@ -112,7 +113,7 @@ func TestExpectedStudy(t *testing.T) {
 						newUploadInfo.Size = uploadInfoValue.Size
 						newUploadInfo.BackupDate = uploadInfoValue.BackupDate
 						newUploadInfo.SOPCount = uploadInfoValue.SOPCount + prvUploadInfo.SOPCount
-
+						
 						newExpectedStudy.UploadInfo = append(newExpectedStudy.UploadInfo, newUploadInfo)
 					   }
 				}
@@ -141,6 +142,14 @@ func TestExpectedStudy(t *testing.T) {
 	}
 
 	client.Disconnect(ctx)
+
+	//TO-DO 
+	/*
+	1. 프로젝트 분리
+	2. UploadInfoFile.txt 작성 시 UploadInfoFile_기관명.txt 으로 변경
+	3. NumberLong 을 int로 변경해도 이상없는지 확인
+	4. test mock-up data 다양하게 테스트
+	*/
 }
 
 func mongoDBConnect(){
