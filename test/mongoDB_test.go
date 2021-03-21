@@ -60,7 +60,7 @@ func TestExpectedStudy(t *testing.T) {
     collection := client.Database("Dev").Collection("ExpectedStudy")
 
 	//findResultCursor, err := collection.Find(ctx, bson.D{})
-	findResultCursor, err := collection.Find(ctx, bson.M{"h":"MEDICHECKSEOBU", "sD":bson.M{"$gte":"20210301","$lte":"20210331"}, "uploadInfo":bson.M{"$size":2}})
+	findResultCursor, err := collection.Find(ctx, bson.M{"h":"MEDICHECKSEOBU", "sD":bson.M{"$gte":"20210101","$lte":"20210331"}, "uploadInfo":bson.M{"$size":2}})
 
 	if err != nil {
 		logger.Fatal(err)
@@ -89,7 +89,7 @@ func TestExpectedStudy(t *testing.T) {
 			fmt.Println("result type :", reflect.TypeOf(findResult))
 			fmt.Println("result :", findResult)
 
-			haveDCMFile := false
+			haveDCMFile,  needChangeUploadInfoData := false, false
 
 			var prvUploadInfo UploadInfoData
 			var newUploadInfo UploadInfoData
@@ -115,11 +115,13 @@ func TestExpectedStudy(t *testing.T) {
 						newUploadInfo.SOPCount = uploadInfoValue.SOPCount + prvUploadInfo.SOPCount
 						
 						newExpectedStudy.UploadInfo = append(newExpectedStudy.UploadInfo, newUploadInfo)
+
+						needChangeUploadInfoData = true
 					   }
 				}
 			}
 
-			if !haveDCMFile {
+			if !haveDCMFile && needChangeUploadInfoData {
 				//uploadInfo 를 하나로 병합
 				updateResult, err := collection.UpdateOne(
 					ctx, 
@@ -149,6 +151,7 @@ func TestExpectedStudy(t *testing.T) {
 	2. UploadInfoFile.txt 작성 시 UploadInfoFile_기관명.txt 으로 변경
 	3. NumberLong 을 int로 변경해도 이상없는지 확인
 	4. test mock-up data 다양하게 테스트
+	5. 수정필요 데이터 추출 테스트, 데이터 변경 테스트로 분리
 	*/
 }
 
